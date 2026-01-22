@@ -1,19 +1,8 @@
 const exceljs= require('exceljs');
-const validate= require('../utils/validate.js');
+const validateSchema= require('../utils/validate.js');
 const User= require('../model/user.js');
 
 const fileController= async(req,res)=>{
-    // console.log("File: ", req.file);
-    // console.log("Body: ", req.body);
-
-    // if(!req.file){
-    //     return res.status(400).json({message: "No file received" });
-    // }
-    // return res.json({
-    // message: "Multer working",
-    // fileName: req.file.originalname,
-    // size: req.file.size,
-    // });
     try{
       const workbook= new exceljs.Workbook();
       await workbook.xlsx.load(req.file.buffer);
@@ -35,21 +24,36 @@ const fileController= async(req,res)=>{
           gender: row.getCell(5).value
         }
 
-        const errors=validate(rowData);
-        // rows.push({
-        //   rowNumber,
-        //   values:row.values
-        // });
+        // console.log("Is Zod schema:", typeof validateSchema.safeParse === "function");
 
-        if(errors.length>0){
+        const ans= validateSchema.safeParse(rowData);
+
+        // console.log("ROW:", rowNumber);
+        // console.log("ROW DATA:", rowData);
+        // console.log("PARSE RESULT:", ans);
+
+        if(!ans.success){
+          // console.log("ERROR OBJECT:", ans.error);
+          // console.log("ERROR ERRORS ARRAY:", ans.error?.errors);
           invalidRecords.push({
             row: rowNumber,
             data: rowData,
-            reason:errors.join(', ')
+            reason: ans.error?.issues?.map(e=>e.message).join(", ")
           })
         }else{
-          validRecords.push(rowData)
+          validRecords.push(ans.data)
         }
+
+
+        // if(errors.length>0){
+        //   invalidRecords.push({
+        //     row: rowNumber,
+        //     data: rowData,
+        //     reason:errors.join(', ')
+        //   })
+        // }else{
+        //   validRecords.push(rowData)
+        // }
 
         // console.log("Row: ",rowNumber, rowData);
       })
@@ -74,4 +78,14 @@ const fileController= async(req,res)=>{
   
 }
 
-module.exports= {fileController};
+const getValidRecords= async(req,res)=>{
+  try{
+    const validRecords= await User.find();
+    return res.status(200).json(validRecords);
+  }catch(error){
+    console.error("Error while fetching the valid records!!", error);
+    return res.status(500).json("Internal server error");
+  }
+}
+
+module.exports= {fileController, getValidRecords};
