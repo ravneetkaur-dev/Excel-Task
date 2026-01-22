@@ -7,7 +7,6 @@ const fileController= async(req,res)=>{
       const workbook= new exceljs.Workbook();
       await workbook.xlsx.load(req.file.buffer);
       const worksheet= workbook.getWorksheet(1);
-      // const rows=[];
 
       const validRecords=[];
       const invalidRecords=[];
@@ -45,17 +44,6 @@ const fileController= async(req,res)=>{
         }
 
 
-        // if(errors.length>0){
-        //   invalidRecords.push({
-        //     row: rowNumber,
-        //     data: rowData,
-        //     reason:errors.join(', ')
-        //   })
-        // }else{
-        //   validRecords.push(rowData)
-        // }
-
-        // console.log("Row: ",rowNumber, rowData);
       })
 
       let insertedCount=0;
@@ -64,7 +52,6 @@ const fileController= async(req,res)=>{
         insertedCount=result.length;
       }
       
-      // return res.json({message:"Excel read successfully...", totalRows:rows.length})
       return res.json({
         totalRecords: validRecords.length+ invalidRecords.length,
         successRecords: validRecords.length,

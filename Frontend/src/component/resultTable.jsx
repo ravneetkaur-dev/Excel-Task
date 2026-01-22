@@ -46,17 +46,6 @@ export const ResultTable= ({id, records})=>{
                     </tr>
                     ))}
 
-                    {/* {records.map((rec, index)=>(
-                        <tr key={index}>
-                            <td>{rec.row}</td>
-                            <td>{rec.data?.firstName||"-"}</td>
-                            <td>{rec.data?.lastName||"-"}</td>
-                            <td>{rec.data?.email||"-"}</td>
-                            <td>{rec.data?.phone||"-"}</td>
-                            <td>{rec.data?.gender||"-"}</td>
-                            {id=="invalid"&&<td>{rec.reason}</td>}
-                        </tr>
-                    ))} */}
                 </tbody>
             </Table>
         </>
